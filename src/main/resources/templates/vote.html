@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<HTML xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <META content="IE=11.0000"
+          http-equiv="X-UA-Compatible">
+
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <TITLE>参与投票</TITLE>
+    <LINK th:href="@{/css/style.css}" rel="stylesheet" type="text/css">
+    <META name="GENERATOR" content="MSHTML 11.00.10586.420">
+</HEAD>
+<BODY>
+<DIV class="wrap" id="header"><IMG th:src="@{/images/logo.gif}"></DIV>
+<DIV class="wrap" id="navbar">
+    <DIV class="profile">
+        <SPAN class="return">
+            <span th:text="'欢迎，'+${session.user.vu_user_name}"></span>
+            <A th:href="@{/findAll/(flag=1)}">返回列表</A>
+        </SPAN>
+        <SPAN class="addnew">
+            <A href="add.html">添加新投票</A>
+        </SPAN>
+        <SPAN class="modify">
+            <A href="#">维护</A>
+        </SPAN>
+        <SPAN class="return">
+            <A href="http://localhost:8080/myVote/User-exit.action">注销</A>
+        </SPAN>
+    </DIV>
+    <DIV class="search">
+        <FORM action="Subject-search.action" method="post"><INPUT name="keywords" class="input-text" type="text"><INPUT
+                name="submit" class="input-button" type="submit" value=""/>
+        </FORM>
+    </DIV>
+</DIV>
+<DIV class="wrap" id="vote">
+    <H2>参与投票</H2>
+    <UL class="list">
+        <LI>
+            <H4 th:text="${m.get('title')}"></H4>
+            <P class="info"th:text="'共有'+${m.optionCount}+'选项，已有'+${m.votes}+'个投票'"></P>
+            <FORM action="/vote/joinedVote" method="post">
+                <!--<INPUT name="voteItem" type="hidden" th:text="${session.user.vu_user_id}"/>
+                <INPUT name="voteItem" type="hidden" th:text="${m.get('titleId')}"/>-->
+                <OL th:if="${m.vsType} eq 1">
+                    <input name="vu_user_id" type="hidden" th:value="${m.vu_user_id}"/>
+                    <input name="vs_id" type="hidden" th:value="${m.titleId}"/>
+                    <!--titleId=${vv.titleId},title=${vv.title},optionCount=${vv.optionCount},votes=${vv.votes},vsType=${vv.vsType}-->
+                    <input name="titleId" type="hidden" th:value="${m.titleId}"/>
+                    <input name="title" type="hidden" th:value="${m.title}"/>
+                    <input name="optionCount" type="hidden" th:value="${m.optionCount}"/>
+                    <input name="votes" type="hidden" th:value="${m.votes}"/>
+                    <input name="vsType" type="hidden" th:value="${m.vsType}"/>
+                    <LI th:each="join,stuState:${joinVoteList}">
+                        <INPUT name="voteItem" type="radio" th:text="${join.vo_option}" th:value="${join.vo_id}"/>
+                    </LI>
+                </OL>
+                <OL th:if="${m.vsType} eq 2">
+                    <input name="vu_user_id" type="hidden" th:text="${m.vu_user_id}"/>
+                    <input name="vs_id" type="hidden" th:text="${m.titleId}"/>
+                    <input name="titleId" type="hidden" th:value="${m.titleId}"/>
+                    <input name="title" type="hidden" th:value="${m.title}"/>
+                    <input name="optionCount" type="hidden" th:value="${m.optionCount}"/>
+                    <input name="votes" type="hidden" th:value="${m.votes}"/>
+                    <input name="vsType" type="hidden" th:value="${m.vsType}"/>
+                    <LI th:each="join,stuState:${joinVoteList}">
+                        <INPUT name="voteItem" type="checkbox" th:text="${join.vo_option}" th:value="${join.vo_id}"/>
+                    </LI>
+                </OL>
+                <P class="voteView"><INPUT type="image" th:src="@{/images/button_vote.gif}"/>
+                    <A th:href="@{/voteContent/(titleId=${m.titleId},title=${m.title},optionCount=${m.optionCount},votes=${m.votes},vsType=${m.vsType})}">
+                        <IMG th:src="@{/images/button_view.gif}"/>
+                    </A>
+                </P>
+            </FORM>
+        </LI>
+    </UL>
+</DIV>
+<DIV class="wrap" id="footer"> 北大青鸟 © 版权所有</DIV>
+
+<script type="text/javascript" th:src="@{/js/jquery-3.4.1.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        ybsx()
+    })
+    function ybsx() {
+        var userId=[[${session.user.vu_user_id}]];
+        var title = [[${m.titleId}]]
+        $.post("/vote/usersVote",{"vu_user_id":userId,"vs_id":title},function (data) {
+            if (data==false){
+                alert("您已经参与过投票，不能再次参与")
+                $(location).attr("href","/vote/findAll")
+            }
+        },"json")
+    }
+</script>
+</BODY>
+</HTML>

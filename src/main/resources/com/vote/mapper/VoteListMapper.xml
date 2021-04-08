@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vote.mapper.VoteListMapper">
+    <select id="findAll" resultType="map">
+        SELECT s.vs_id titleId,s.vs_title title,s.vs_type vsType,COUNT(DISTINCT o.vo_id) optionCount,COUNT(DISTINCT i.vi_id) votes
+	    FROM vote_subject s
+	    LEFT JOIN vote_option o ON s.vs_id=o.vs_id
+        LEFT JOIN vote_item i ON s.vs_id=i.vs_id
+        <where>
+            <if test="_parameter !=null and _parameter !=''">s.vs_title like concat('%',#{vs_title},'%')</if>
+        </where>
+        GROUP BY s.vs_id,s.vs_title
+    </select>
+    <select id="findByTitle" resultType="map">
+        SELECT s.vs_id vsId,s.vs_title vsTitle,COUNT(DISTINCT o.vo_id) voId,COUNT(DISTINCT i.vi_id) viId
+	    FROM vote_subject s
+	    LEFT JOIN vote_option o ON s.vs_id=o.vs_id
+        LEFT JOIN vote_item i ON s.vs_id=i.vs_id
+        <where>
+            <if test="vs_title!=null and vs_title!=''">s.vs_title like concat('%',#{vs_title},'%')</if>
+        </where>
+    </select>
+    <select id="findById" resultType="map">
+        SELECT (SELECT COUNT(1) FROM vote_item vi WHERE vi.vo_id = vo.vo_id) countVi, vo.*
+        FROM vote_option vo
+        WHERE vo.vs_id = #{id}
+        ORDER BY vo.vo_order
+         </select>
+    <select id="usersVote" parameterType="map" resultType="map">
+        select * from vote_item where vu_user_id = #{vu_user_id} and vs_id=#{vs_id}
+    </select>
+    <select id="titleVote" resultType="com.vote.pojo.VoteSubject">
+        select * from vote_subject where vs_title = #{vs_title}
+    </select>
+    <select id="joinVote" resultType="com.vote.pojo.VoteOption">
+        SELECT * FROM  vote_option WHERE vs_id=#{id} ORDER BY vo_order
+    </select>
+    <select id="typeVote" parameterType="com.vote.pojo.VoteSubject" resultType="com.vote.pojo.VoteSubject">
+        select * from vote_subject where vs_title=#{vs_title} and vs_type=#{vs_type}
+    </select>
+    <select id="optionVote" parameterType="com.vote.pojo.VoteOption" resultType="map">
+        SELECT (SELECT COUNT(1) FROM vote_option WHERE vs_id = #{vs_id}) num,vo.* FROM vote_option vo WHERE vo_option IN (#{vo_option}) AND vs_id = #{vs_id}
+    </select>
+
+    <select id="allVoteOption" parameterType="com.vote.pojo.VoteOption" resultType="com.vote.pojo.VoteOption">
+        select * from vote_option where vs_id=#{vs_id}
+    </select>
+
+    <delete id="delVi" parameterType="com.vote.pojo.VoteItem">
+        delete from vote_item where vs_id=#{vs_id} and vo_id=#{vo_id}
+    </delete>
+
+    <update id="modifyVo" parameterType="com.vote.pojo.VoteOption">
+        update vote_option set vo_option=#{vo_option} where vo_id=#{vo_id} and vs_id = #{vs_id}
+    </update>
+
+    <delete id="delVo" parameterType="com.vote.pojo.VoteOption">
+        delete from vote_option where vo_option=#{vo_option} and vs_id = #{vs_id}
+    </delete>
+    
+    <insert id="addVo" parameterType="com.vote.pojo.VoteOption">
+        insert into vote_option(vs_id,vo_option,vo_order) value (#{vs_id},#{vo_option},#{vo_order})
+    </insert>
+
+    <select id="selectOptionNums" resultType="int">
+        SELECT COUNT(1) FROM vote_option WHERE vs_id = #{vs_id}
+    </select>
+
+
+    <insert id="addVoteMsg" parameterType="com.vote.pojo.VoteSubject">
+        insert into vote_subject(vs_title,vs_type) value(#{vs_title},#{vs_type})
+    </insert>
+    <insert id="addVoteMsg1" parameterType="list">
+        insert into vote_option(vs_id,vo_option,vo_order)
+        <foreach collection="list" item="vo" open="values" separator=",">
+            (#{vo.vs_id},#{vo.vo_option},#{vo.vo_order})
+        </foreach>
+    </insert>
+    <insert id="addVoteCount" parameterType="com.vote.pojo.VoteItem">
+        insert into vote_item(vu_user_id,vs_id,vo_id) value(#{vu_user_id},#{vs_id},#{vo_id})
+    </insert>
+    <update id="updateVote" parameterType="com.vote.pojo.VoteSubject">
+        update vote_subject
+        <set>
+            <if test="vs_title!=null and vs_title!=''">vs_title=#{vs_title},</if>
+            <if test="vs_type!=null and vs_type!=''">vs_type=#{vs_type},</if>
+        </set>
+        where vs_id = #{vs_id}
+    </update>
+
+    <select id="selectId"  parameterType="com.vote.pojo.VoteOption" resultType="com.vote.pojo.VoteOption">
+        select * from vote_option where vs_id=#{vs_id} and vo_id=#{vo_id}
+    </select>
+    <select id="selectTitle"  parameterType="com.vote.pojo.VoteOption" resultType="com.vote.pojo.VoteOption">
+        select * from vote_option where vs_id=#{vs_id} and vo_option=#{vo_option}
+    </select>
+    <delete id="delVoteSubject">
+        delete from vote_subject where vs_id = #{vs_id}
+    </delete>
+    <delete id="delVoteOption">
+        delete from vote_option where vs_id = #{vs_id}
+    </delete>
+    <delete id="delVoteItem">
+        delete from vote_item where vs_id = #{vs_id}
+    </delete>
+</mapper>

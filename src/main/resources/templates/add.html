@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<HTML xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <META content="IE=11.0000"
+          http-equiv="X-UA-Compatible">
+
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <TITLE>发布新投票</TITLE>
+    <LINK href="css/style.css" rel="stylesheet" type="text/css">
+    <META name="GENERATOR" content="MSHTML 11.00.10586.420">
+</HEAD>
+<BODY>
+<DIV class="wrap" id="header"><IMG th:src="@{/images/logo.gif}"></DIV>
+<DIV class="wrap" id="navbar">
+    <DIV class="profile">
+        <SPAN class="return">
+            <span th:text="'欢迎，'+${session.user.vu_user_name}"></span>
+            <A href="/vote/findAll">返回列表</A>
+        </SPAN>
+        <SPAN class="addnew">
+            <A href="add.html">添加新投票</A>
+        </SPAN>
+        <SPAN class="modify">
+            <A href="#">维护</A>
+        </SPAN>
+        <SPAN class="return">
+            <A href="http://localhost:8080/myVote/User-exit.action">注销</A>
+        </SPAN>
+    </DIV>
+    <DIV class="search">
+        <FORM action="Subject-search.action" method="post">
+            <INPUT name="keywords" class="input-text" type="text">
+            <INPUT ame="submit" class="input-button" type="submit" value=""/>
+        </FORM>
+    </DIV>
+</DIV>
+<DIV class="box" id="voteManage">
+    <H2>添加新投票</H2>
+    <DIV class="content">
+        <FORM  action="addVote" method="post">
+            <DL>
+                <DT>投票内容：</DT>
+                <DD>
+                    <INPUT name="struts.token.name" type="hidden" value="token">
+                    <INPUT name="token" type="hidden" value="B1XPKLEQ7DQ6DNVWKBARPOY4HLYYXDE6">
+                    <INPUT name="vs_title" class="input-text" id="title" type="text" required="required">
+                </DD>
+                <DT>投票类型：</DT>
+                <DD>
+                    <INPUT name="vs_type" type="radio" value="1" required="required">单选
+                    <INPUT name="vs_type" type="radio" value="2" required="required">多选
+                </DD>
+                <DT>投票选项：</DT>
+                <DD id="voteoptions">
+                    <P><INPUT name="vo_option" class="input-text" type="text" required="required"></P>
+                    <P><INPUT name="vo_option" class="input-text" type="text" required="required"></P>
+                </DD>
+                <DT>
+
+                </DT>
+                <DD class="button">
+                    <INPUT type="image" src="images/button_submit.gif">
+                    <A href="#">增加选项</A>
+                    <A href="/vote/findAll">取消操作</A>
+                </DD>
+            </DL>
+        </FORM>
+    </DIV>
+</DIV>
+<DIV class="wrap" id="footer"> 北大青鸟 © 版权所有</DIV>
+<script type="text/javascript" src="js/jquery-3.4.1.js"></script>
+<script type="text/javascript">
+    $(function () {
+        del()
+    })
+    $(".button>a:eq(0)").click(function () {
+        var html = "<p><input name='vo_option' class='input-text' type='text' required='required'/><span class='s_remove'>删除</span></p>"
+        $("#voteoptions").append(html)
+    })
+    function del() {
+        $("#voteoptions").on("click", ".s_remove", function () {
+            $(this).parent().remove();
+        });
+    }
+    $("#title").change(function () {
+        var title = $(this).val()
+        $.post("/vote/checkTitle",{"title":title},function (data) {
+            if (data==true){
+                alert("标题可用")
+            }else {
+                alert("标题重复")
+            }
+        },"json")
+    })
+</script>
+</BODY>
+</HTML>

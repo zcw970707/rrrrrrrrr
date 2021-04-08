@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<HTML xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <META content="IE=11.0000"
+          http-equiv="X-UA-Compatible">
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <TITLE>投票列表</TITLE>
+    <LINK th:href="@{/css/style.css}" rel="stylesheet" type="text/css">
+    <META name="GENERATOR" content="MSHTML 11.00.10586.420">
+</HEAD>
+<BODY>
+<DIV class="wrap" id="header"><IMG th:src="@{/images/logo.gif}"></DIV>
+<DIV class="wrap" id="navbar">
+    <DIV class="profile">
+        <SPAN class="return">
+            <span th:text="'欢迎，'+${session.user.vu_user_name}"></span>
+            <A th:href="@{/findAll/(flag=1)}">返回列表</A>
+        </SPAN>
+        <SPAN class="addnew" th:if="${session.user.vu_user_name} eq admin">
+            <A th:href="@{/add.html}">添加新投票</A>
+        </SPAN>
+
+        <SPAN class="addnew" th:if="${session.user.vu_user_name}  eq !admin" style="color: grey">
+            添加新投票
+        </SPAN>
+        <SPAN class="modify" th:if="${session.user.vu_user_name}  eq admin">
+            <A href="#">维护</A>
+        </SPAN>
+        <SPAN class="modify" th:if="${session.user.vu_user_name}  eq !admin" style="color: grey">
+            维护
+        </SPAN>
+        <SPAN class="return">
+            <A th:href="@{/userCancel}">注销</A>
+        </SPAN>
+    </DIV>
+    <DIV class="search">
+        <FORM action="/vote/findAll" method="post">
+            <INPUT name="vs_title" class="input-text" type="text">
+            <INPUT name="submit" class="input-button" type="submit" value=""/>
+        </FORM>
+    </DIV>
+</DIV>
+<DIV class="wrap" id="vote">
+    <H2>投票列表</H2>
+    <DIV style="float: right;" th:if="${flag} eq 1">
+        <A th:href="@{'/findAll/'(pageIndex=1,flag=1)}">首页</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum-1},flag=1)}">| 上一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum+1},flag=1)}">下一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pages},flag=1)}">末页</A>
+    </DIV>
+    <DIV style="float: right;" th:if="${flag} eq 2">
+        <A th:href="@{'/findAll/'(pageIndex=1,flag=2)}">首页</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum-1},flag=2)}">| 上一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum+1},flag=2)}">下一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pages},flag=2)}">末页</A>
+    </DIV>
+    <BR>
+    <UL class="list">
+        <LI th:each="vv,stuState:${pageResult}"th:class="${stuState.odd}?'odd'">
+            <H4>
+                <A th:href="@{/voteContent/(titleId=${vv.titleId},title=${vv.title},optionCount=${vv.optionCount},votes=${vv.votes},vsType=${vv.vsType})}" th:text="${vv.title}"></A>
+            </H4>
+            <DIV class="join" th:if="${flag} eq 1">
+                <A th:href="@{/joinVote/(titleId=${vv.titleId},title=${vv.title},optionCount=${vv.optionCount},votes=${vv.votes},vsType=${vv.vsType},vu_user_id=${session.user.vu_user_id})}">我要参与</A>
+            </DIV>
+            <DIV class="join" th:if="${flag} eq 2">
+                <A th:href="@{/updateVote/(titleId=${vv.titleId},title=${vv.title},optionCount=${vv.optionCount},votes=${vv.votes},vsType=${vv.vsType})}">维护</A>
+                <A th:href="@{/deleteVote/(titleId=${vv.titleId})}">删除</A>
+            </DIV>
+            <P class="info" th:text="'共有'+${vv.optionCount}+'个选项，已有'+${vv.votes}+'个投票'"></P>
+        </LI>
+    </UL>
+    <DIV style="float: right;" th:if="${flag} eq 1">
+        <A th:href="@{'/findAll/'(pageIndex=1,flag=1)}">首页</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum-1},flag=1)}">| 上一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum+1},flag=1)}">下一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pages},flag=1)}">末页</A>
+    </DIV>
+    <DIV style="float: right;" th:if="${flag} eq 2">
+        <A th:href="@{'/findAll/'(pageIndex=1,flag=2)}">首页</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum-1},flag=2)}">| 上一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pageNum+1},flag=2)}">下一页 |</A>
+        <A th:href="@{'/findAll/'(pageIndex=${page.pages},flag=2)}">末页</A>
+    </DIV>
+</DIV>
+<DIV class="wrap" id="footer"> 北大青鸟 © 版权所有</DIV>
+<script type="text/javascript" th:src="@{/js/jquery-3.4.1.js}"></script>
+<script th:inline="javascript">
+    $(".modify").click(function () {
+        var userName=[[${session.user.vu_user_name}]];
+        if (userName="admin"){
+            $(location).attr("href","/vote/findAll?flag=2")
+        }else {
+            alert("权限不足，请联系管理员")
+        }
+
+    })
+    $(".addnew").click(function () {
+        var userName=[[${session.user.vu_user_name}]];
+        if (userName="admin"){
+            $(location).attr("href","/vote/findAll?flag=2")
+        }else {
+            alert("权限不足，请联系管理员")
+        }
+
+    })
+</script>
+</BODY>
+</HTML>

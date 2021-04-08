@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><HTML 
+xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"><HEAD><META content="IE=11.0000"
+http-equiv="X-UA-Compatible">
+ 
+<META http-equiv="Content-Type" content="text/html; charset=utf-8"> <TITLE>注   
+册</TITLE> <LINK href="css/style.css" rel="stylesheet" type="text/css"> 
+<SCRIPT language="javascript">
+	
+</SCRIPT>
+ 
+<META name="GENERATOR" content="MSHTML 11.00.10586.420"></HEAD> 
+<BODY>
+<DIV class="wrap" id="header"><IMG src="images/logo.gif"> </DIV>
+<DIV class="wrap" id="navbar">
+<DIV class="search"><!--  
+		<form method="get" action="index.html">
+			<input type="text" name="keywords" class="input-text" /><input type="submit" name="submit" class="input-button" value="" />
+		</form>
+	-->	
+	</DIV></DIV>
+<DIV class="box" id="register">
+<H2>新用户注册</H2>
+<DIV class="content">
+<FORM onsubmit="return check()" action="/vote/addUsers" method="post">
+<DL>
+  <DT>用户名：</DT>
+  <DD><INPUT name="vu_user_name" class="input-text" id="userName" onblur="nameCheck()" type="text"/><span id="span1"></span></DD>
+  <DT>密码：</DT>
+  <DD><INPUT name="vu_password" class="input-text" id="password" type="password" onblur="pwdCheck()"/><span id="span2"></span></DD>
+  <DT>确认密码：</DT>
+  <DD><INPUT name="userVo.confirmPassword" class="input-text" id="repass" type="password" onblur="againPwdCheck()"/><span id="span3"></span></DD>
+  <DT></DT>
+  <DD><INPUT name="submit" class="input-button" type="submit" value=""/><input name="vu_status" value="1" type="hidden"/></DD>
+  <span th:text="${msg}" style="color: red"></span>
+</DL>
+</FORM>
+<DIV class="error"></DIV>
+<DIV class="error"></DIV></DIV></DIV>
+<DIV class="wrap" id="footer">北大青鸟 © 版权所有 </DIV>
+<script type="text/javascript" src="js/jquery-3.4.1.js"></script>
+<script type="text/javascript">
+  function nameCheck(){
+    var flag = true;
+    var userName = $("#userName").val()
+    var regName = /^[a-zA-Z]\w{3,15}$/ig;
+    if (userName==""){
+      flag = false;
+      $("#span1").text("用户名不能为空").css("color","red")
+    }else if (!regName.test(userName)){
+      flag = false;
+      $("#span1").text("用户名格式错误").css("color","red")
+    }else {
+      $.post("/vote/regCheck",{"vu_user_name":userName},function (data) {
+        if (data==true){
+          flag = true;
+          $("#span1").text("用户名可用").css("color","green")
+        }else {
+          flag = false;
+          $("#span1").text("用户名重复").css("color","red")
+        }
+      },"json")
+    }
+    return flag;
+  }
+  function pwdCheck() {
+    var flag = true;
+    var pwd = $("#password").val()
+    var regPwd = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{6,16}/;
+    if (pwd==""){
+      flag = false;
+      $("#span2").text("密码不能为空").css("color","red")
+    }else if (!regPwd.test(pwd)){
+      flag = false;
+      $("#span2").text("密码格式错误，必须包含数字字母特殊符号中的三种,长度为6-16位").css("color","red")
+    }else {
+      $("#span2").text("密码可用").css("color","green")
+      flag = true;
+    }
+    return flag;
+  }
+  function againPwdCheck() {
+    var flag = true;
+    var pwd = $("#repass").val()
+    var againPwd = $("#password").val()
+    var regPwd = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{6,16}/;
+    if (pwd==""){
+      flag = false;
+      $("#span3").text("密码不能为空").css("color","red")
+    }else if (!regPwd.test(pwd)){
+      flag = false;
+      $("#span3").text("密码格式错误，必须包含数字字母特殊符号中的三种,长度为6-16位").css("color","red")
+    }else if (pwd!=againPwd){
+      flag = false;
+      $("#span3").text("两次密码输入不一致").css("color","red")
+    }else {
+      $("#span3").text("两次密码输入正确").css("color","green")
+      flag = true;
+    }
+    return flag;
+  }
+  function check() {
+    var flag = nameCheck();
+    var flag1 = pwdCheck();
+    var flag2 = againPwdCheck();
+    if (flag && flag1 && flag2){
+      return true;
+    }else {
+      return false;
+    }
+  }
+</script>
+</BODY>
+</HTML>

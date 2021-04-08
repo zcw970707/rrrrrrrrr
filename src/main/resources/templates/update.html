@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<HTML xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <META content="IE=11.0000"
+          http-equiv="X-UA-Compatible">
+
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <TITLE>发布新投票</TITLE>
+    <LINK th:href="@{/css/style.css}" rel="stylesheet" type="text/css">
+    <META name="GENERATOR" content="MSHTML 11.00.10586.420">
+</HEAD>
+<BODY>
+<DIV class="wrap" id="header"><IMG th:src="@{/images/logo.gif}"></DIV>
+<DIV class="wrap" id="navbar">
+    <DIV class="profile">
+        <SPAN class="return">
+            <span th:text="'欢迎，'+${session.user.vu_user_name}"></span>
+            <A href="/vote/findAll">返回列表</A>
+        </SPAN>
+        <SPAN class="addnew">
+            <A href="add.html">添加新投票</A>
+        </SPAN>
+        <SPAN class="modify">
+            <A href="#">维护</A>
+        </SPAN>
+        <SPAN class="return">
+            <A href="http://localhost:8080/myVote/User-exit.action">注销</A>
+        </SPAN>
+    </DIV>
+    <DIV class="search">
+        <FORM action="/vote/maintainVote" method="post">
+            <INPUT name="keywords" class="input-text" type="text">
+            <INPUT ame="submit" class="input-button" type="submit" value=""/>
+        </FORM>
+    </DIV>
+</DIV>
+<DIV class="box" id="voteManage">
+    <H2>添加新投票</H2>
+    <DIV class="content">
+        <FORM  action="/vote/maintainVote" method="post">
+            <DL>
+                <DT>投票内容：</DT>
+                <DD>
+                    <INPUT name="struts.token.name" type="hidden" value="token">
+                    <INPUT name="token" type="hidden" value="B1XPKLEQ7DQ6DNVWKBARPOY4HLYYXDE6">
+                    <input name="userId" type="hidden" th:value="${session.user.vu_user_id}"/>
+                    <input name="vs_id" type="hidden" th:value="${contentMap.titleId}"/>
+                    <INPUT name="vs_title" class="input-text" id="title" type="text" required="required" th:value="${contentMap.title}">
+                </DD>
+                <DT>投票类型：</DT>
+                <DD>
+                    <INPUT name="vs_type" type="radio" value="1"  th:checked="${contentMap.vsType} eq 1">单选
+                    <INPUT name="vs_type" type="radio" value="2" th:checked="${contentMap.vsType} eq 2">多选
+                </DD>
+                <DT>投票选项：</DT>
+                <DD id="voteoptions">
+                    <P th:each="vo,stuState:${optionsMap}">
+                        <INPUT name="voOption" class="input-text" type="text" required="required" th:value="${vo.vo_option}">
+                        <input name="voOptionId" type="hidden" th:value="${vo.vo_id}"/>
+                        <span class="ddl">删除</span>
+                    </P>
+                </DD>
+                <DD class="button">
+                    <INPUT type="image" th:src="@{/images/button_submit.gif}">
+                    <A href="#">增加选项</A>
+                    <A href="/vote/findAll">取消操作</A>
+                </DD>
+            </DL>
+        </FORM>
+    </DIV>
+</DIV>
+<DIV class="wrap" id="footer"> 北大青鸟 © 版权所有</DIV>
+<script type="text/javascript" th:src="@{/js/jquery-3.4.1.js}"></script>
+<script type="text/javascript">
+    $(function () {
+
+        del()
+    })
+    $(".button>a:eq(0)").click(function () {
+        var id = $("#voteoptions>p:last>input:last").val()
+        ++id;
+        var html = "<p><input name='voOption' class='input-text' type='text' required='required'/><input name='voOptionId' type='hidden' value='"+id+"'/><span class='s_remove'>删除</span></p>"
+        $("#voteoptions").append(html)
+    })
+    function del() {
+        $("#voteoptions").on("click", ".s_remove", function () {
+            $(this).parent().remove();
+        });
+    }
+    $("#title").change(function () {
+        var title = $(this).val()
+        alert(title)
+        $.post("/vote/checkTitle",{"title":title},function (data) {
+            if (data==true){
+                alert("标题可用")
+            }else {
+                alert("标题重复")
+            }
+        },"json")
+    })
+    $(".ddl").click(function () {
+        $(this).parent().empty()
+    })
+</script>
+</BODY>
+</HTML>
